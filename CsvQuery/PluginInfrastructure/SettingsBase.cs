@@ -149,11 +149,13 @@ namespace CsvQuery.PluginInfrastructure
         {
             // We bind a copy of this object and only apply it after they click "Ok"
             var copy = (Settings) MemberwiseClone();
-           
+
+            int ClientWidth = 800;
+            var ClientHeight = 600;
             var dialog = new Form
             {
                 Text = "Settings",
-                ClientSize = new Size(300, 300),
+                ClientSize = new Size(ClientWidth, ClientHeight),
                 MinimumSize = new Size(250, 250),
                 ShowIcon = false,
                 AutoScaleMode = AutoScaleMode.Font,
@@ -166,7 +168,7 @@ namespace CsvQuery.PluginInfrastructure
                         Text = "&Cancel",
                         Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
                         Size = new Size(75, 23),
-                        Location = new Point(300 - 75 - 13, 300 - 23 - 13),
+                        Location = new Point(ClientWidth - 75 - 13, ClientHeight - 23 - 13),
                         UseVisualStyleBackColor = true
                     },
                     new Button
@@ -175,7 +177,7 @@ namespace CsvQuery.PluginInfrastructure
                         Text = "&Ok",
                         Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
                         Size = new Size(75, 23),
-                        Location = new Point(300 - 75 - 13 - 81, 300 - 23 - 13),
+                        Location = new Point(ClientWidth - 75 - 13 - 81, ClientHeight - 23 - 13),
                         UseVisualStyleBackColor = true
                     },
                     new PropertyGrid
@@ -183,7 +185,7 @@ namespace CsvQuery.PluginInfrastructure
                         Name = "Grid",
                         Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
                         Location = new Point(13, 13),
-                        Size = new Size(300 - 13 - 13, 300 - 55),
+                        Size = new Size(ClientWidth - 13 - 13, ClientHeight - 55),
                         AutoScaleMode = AutoScaleMode.Font,
                         AutoScaleDimensions = new SizeF(6F,13F),
                         SelectedObject = copy

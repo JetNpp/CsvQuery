@@ -53,9 +53,31 @@
 
         private void OnSettingsChanged(object sender, SettingsChangedEventArgs e)
         {
+            if (e.Changed.Contains(nameof(Settings.UseNppStyling)))
+            {
+                this.ApplyStyling(e.NewSettings.UseNppStyling);
+            }
+
+            if (e.Changed.Contains(nameof(Settings.ShowRowNumbers)))
+            {
+                this.contextmenuShowRowNumbers.Checked = e.NewSettings.ShowRowNumbers;
+                this.dataGrid.RowHeadersVisible = this.contextmenuShowRowNumbers.Checked;
+                this.FormatDataGrid();
+            }
+
+            /*
             if (!e.Changed.Contains(nameof(Settings.UseNppStyling)))
                 return;
             this.ApplyStyling(e.NewSettings.UseNppStyling);
+            */
+        }
+
+        /// <summary>
+        /// Applies show row numbers
+        /// </summary>
+        public void ApplyShowRowNumbers(bool show)
+        {
+
         }
 
         /// <summary>
@@ -457,6 +479,7 @@
         private void OnContextmenuShowRowNumbers(object sender, EventArgs e)
         {
             this.contextmenuShowRowNumbers.Checked = this.dataGrid.RowHeadersVisible = !this.dataGrid.RowHeadersVisible;
+            Main.Settings.ShowRowNumbers = this.contextmenuShowRowNumbers.Checked;
             this.FormatDataGrid();
         }
 

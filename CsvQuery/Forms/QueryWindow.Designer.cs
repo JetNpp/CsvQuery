@@ -130,6 +130,9 @@
             this.contextmenuShowRowNumbers.Size = new System.Drawing.Size(295, 36);
             this.contextmenuShowRowNumbers.Text = "Show row numbers";
             this.contextmenuShowRowNumbers.Click += new System.EventHandler(this.OnContextmenuShowRowNumbers);
+            this.contextmenuShowRowNumbers.Checked = this.dataGrid.RowHeadersVisible;
+            this.FormatDataGrid();
+
             // 
             // btnAnalyze
             // 
