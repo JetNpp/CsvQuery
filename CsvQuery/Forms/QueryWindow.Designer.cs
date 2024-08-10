@@ -71,7 +71,7 @@
             this.dataGrid.Location = new System.Drawing.Point(13, 27);
             this.dataGrid.Name = "dataGrid";
             this.dataGrid.ReadOnly = true;
-            this.dataGrid.RowHeadersVisible = false;
+            this.dataGrid.RowHeadersVisible = Main.Settings.ShowRowNumbers;
             this.dataGrid.Size = new System.Drawing.Size(259, 223);
             this.dataGrid.TabIndex = 1;
             this.dataGrid.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnDataBindingComplete);

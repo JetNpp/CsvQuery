@@ -18,6 +18,9 @@
         [Description("Saves the query cache to disk between boots"), Category("General"), DefaultValue(true)]
         public bool SaveQueryCache { get; set; }
 
+        [Description("Show row numbers"), Category("General"), DefaultValue(true)]
+        public bool ShowRowNumbers { get; set; }
+
         [Description("Default separators when generating CSV"), Category("Generation"), DefaultValue(",")]
         public string DefaultSeparator { get; set; }
 
