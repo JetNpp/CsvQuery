@@ -66,7 +66,6 @@
             this.dataGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGrid.ContextMenuStrip = this.contextMenuStrip;
             this.dataGrid.Location = new System.Drawing.Point(13, 27);
             this.dataGrid.Name = "dataGrid";
@@ -74,9 +73,17 @@
             this.dataGrid.RowHeadersVisible = Main.Settings.ShowRowNumbers;
             this.dataGrid.Size = new System.Drawing.Size(259, 223);
             this.dataGrid.TabIndex = 1;
+            System.Drawing.Font oldFont = this.dataGrid.DefaultCellStyle.Font;
+            this.dataGrid.DefaultCellStyle.Font = new System.Drawing.Font(oldFont.Name, Main.Settings.DatagridCellFontSize);
             this.dataGrid.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnDataBindingComplete);
-            //this.dataGrid.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
-            //this.dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
+
+            // this.dataGrid.RowsDefaultCellStyle.WrapMode = DataGridViewTriState.True;
+            // this.dataGrid.VirtualMode = true;
+            this.dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCellsExceptHeader;
+            this.dataGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCellsExceptHeaders;
+            this.dataGrid.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+            this.dataGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+
             // 
             // contextMenuStrip
             // 

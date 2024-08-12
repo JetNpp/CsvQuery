@@ -202,7 +202,7 @@ namespace CsvQuery
         /// </summary>
         public static void AboutCsvQuery()
         {
-            const int xsize = 300, ysize = 180;
+            const int xsize = 400, ysize = 240;
             
             var gitVersionInformationType = Assembly.GetExecutingAssembly().GetType("CsvQuery.GitVersionInformation");
             var semVer = (string)gitVersionInformationType.GetField("SemVer").GetValue(null);
@@ -229,7 +229,7 @@ namespace CsvQuery
                     {
                         Location = new Point(13,13),
                         Size = new Size(xsize-13-13,ysize-13-13-23-6),
-                        Text = $"CSV Query v{semVer}\r\n\r\nAllows SQL queries against CSV files.\r\n\r\nThe SQL syntax is the same as SQLite.\r\nThe table \"THIS\" represents the current file.\r\n\r\nBy jokedst@gmail.com\r\nLicense: GPL v3",
+                        Text = $"CSV Query v{semVer}\r\n\r\nAllows SQL queries against CSV files.\r\n\r\nThe SQL syntax is the same as SQLite.\r\nThe table \"THIS\" represents the current file.\r\n\r\nBy jokedst@gmail.com,Mod by github.com/JetNpp(2024)\r\nLicense: GPL v3",
                         TextAlign = ContentAlignment.MiddleCenter,
                         Font = new Font("Consolas", 8.25F)
                     }

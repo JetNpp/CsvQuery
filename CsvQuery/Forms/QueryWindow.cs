@@ -14,7 +14,8 @@
     using PluginInfrastructure;
     using Properties;
     using Tools;
-    
+    using System.Runtime.InteropServices;
+
     /// <summary>
     /// The query window that shows the current query and the results in a grid
     /// </summary><inheritdoc />
@@ -47,7 +48,7 @@
             }
 
             if (Main.Settings.UseNppStyling) this.ApplyStyling(true);
-            
+
             Main.Settings.SettingsChanged += this.OnSettingsChanged;
         }
 
@@ -65,19 +66,18 @@
                 this.FormatDataGrid();
             }
 
-            /*
-            if (!e.Changed.Contains(nameof(Settings.UseNppStyling)))
-                return;
-            this.ApplyStyling(e.NewSettings.UseNppStyling);
-            */
-        }
-
-        /// <summary>
-        /// Applies show row numbers
-        /// </summary>
-        public void ApplyShowRowNumbers(bool show)
-        {
-
+            if (e.Changed.Contains(nameof(Settings.DatagridCellFontSize)))
+            {
+                if (e.NewSettings.DatagridCellFontSize >= 6.0 && e.NewSettings.DatagridCellFontSize <= 72.0f)
+                {
+                    SendMessage(this.dataGrid.Handle, WM_SETREDRAW, false, 0);
+                    System.Drawing.Font oldFont = this.dataGrid.DefaultCellStyle.Font;
+                    Main.Settings.DatagridCellFontSize = e.NewSettings.DatagridCellFontSize;
+                    this.dataGrid.DefaultCellStyle.Font = new System.Drawing.Font(oldFont.Name, Main.Settings.DatagridCellFontSize);
+                    SendMessage(this.dataGrid.Handle, WM_SETREDRAW, true, 0);
+                    this.dataGrid.Refresh();
+                }
+            }
         }
 
         /// <summary>
@@ -85,13 +85,13 @@
         /// </summary>
         public void ApplyStyling(bool active)
         {
-            if (this._winColors == null) this._winColors = new[] {this.dataGrid.ForeColor, this.dataGrid.BackgroundColor, this.dataGrid.BackColor};
+            if (this._winColors == null) this._winColors = new[] { this.dataGrid.ForeColor, this.dataGrid.BackgroundColor, this.dataGrid.BackColor };
             if (active)
             {
                 // Get NPP colors 
                 var backgroundColor = PluginBase.GetDefaultBackgroundColor();
                 var foreColor = PluginBase.GetDefaultForegroundColor();
-                var inBetween = Color.FromArgb((foreColor.R + backgroundColor.R*3) / 4, (foreColor.G + backgroundColor.G*3) / 4, (foreColor.B + backgroundColor.B*3) / 4);
+                var inBetween = Color.FromArgb((foreColor.R + backgroundColor.R * 3) / 4, (foreColor.G + backgroundColor.G * 3) / 4, (foreColor.B + backgroundColor.B * 3) / 4);
 
                 this.ApplyColors(foreColor, backgroundColor, inBetween);
                 this.dataGrid.EnableHeadersVisualStyles = false;
@@ -301,6 +301,96 @@
             });
         }
 
+        // *** API Declarations ***
+        [DllImport("user32.dll")]
+        private static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 lParam);
+        private const int WM_SETREDRAW = 11;
+
+        public T Longest<T>(IEnumerable<T> sequence, Func<T, int> propertyAccessor)
+        {
+            int max = int.MinValue;
+            T maxItem = default(T);
+
+            foreach (var i in sequence)
+            {
+                var propertyValue = propertyAccessor(i);
+                if (propertyValue > max)
+                {
+                    max = propertyValue;
+                    maxItem = i;
+                }
+            }
+
+            return maxItem;
+        }
+
+        /// <summary>
+        /// Provides very fast and basic column sizing for large data sets.
+        /// </summary>
+        private void FastAutoSizeColumns(DataGridView targetGrid,bool fontChanged)
+        {
+            // Cast out a DataTable from the target grid datasource.
+            // We need to iterate through all the data in the grid and a DataTable supports enumeration.
+            var gridTable = (DataTable)targetGrid.DataSource;
+            System.Drawing.Font font = this.dataGrid.DefaultCellStyle.Font;
+
+            /*
+            if (fontChanged)
+            {
+                    using (var gfx = this.dataGrid.CreateGraphics())
+                    {
+                        this.dataGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
+
+                        var points = font.SizeInPoints;
+                        int pixels = (int)(points * gfx.DpiX / 72 + 6);
+                        for (int i = 0; i < dataGrid.Rows.Count; ++i)
+                        {
+                            if (dataGrid.Rows[i].Height == pixels)
+                            {
+                                break;
+                            }
+
+                            dataGrid.Rows[i].Height = pixels;
+                        }
+
+                        this.dataGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCellsExceptHeaders;
+                    }
+            }
+            */
+                       
+            // Create a graphics object from the target grid. Used for measuring text size.
+            using (var gfx = targetGrid.CreateGraphics())
+            {
+                // Iterate through the columns.
+                for (int i = 0; i < gridTable.Columns.Count; i++)
+                {
+                    // Leverage Linq enumerator to rapidly collect all the rows into a string array, making sure to exclude null values.
+                    string[] colStringCollection = gridTable.AsEnumerable().Where(r => r.Field<object>(i) != null).Select(r => r.Field<object>(i).ToString()).ToArray();
+                    // var longestColString = colStringCollection.OrderByDescending(n => n.Length).FirstOrDefault();
+                    var longestColString = Longest(colStringCollection, s => s.Length);
+
+                    if (longestColString.Length < targetGrid.Columns[i].HeaderText.Length)
+                    {
+                        longestColString = targetGrid.Columns[i].HeaderText;
+                    }
+                    
+                    // Use the graphics object to measure the string size.
+                    var colWidth = gfx.MeasureString(longestColString, font);
+                    colWidth.Width += 6.0f;
+
+                    // If the calculated width is larger than the column header width, set the new column width.
+                    if (colWidth.Width > targetGrid.Columns[i].HeaderCell.Size.Width)
+                    {
+                        targetGrid.Columns[i].Width = (int)colWidth.Width;
+                    }
+                    else // Otherwise, set the column width to the header width.
+                    {
+                        targetGrid.Columns[i].Width = Math.Min(targetGrid.Columns[i].HeaderCell.Size.Width, (int)colWidth.Width);
+                    }
+                }
+            }
+        }
+
         private void Execute(IntPtr bufferId, DiagnosticTimer watch)
         {
             Main.DataStorage.SetActiveTab(bufferId);
@@ -351,15 +441,21 @@
 
             // Insert rows
             foreach (var row in toshow.Skip(1))
+            { 
                 table.Rows.Add(row);
+            }
             watch.Checkpoint("Create DataTable");
 
             this.UiThread(() =>
             {
+                SendMessage(this.dataGrid.Handle, WM_SETREDRAW, false, 0);
                 this.dataGrid.DataSource = table;
+
                 // Enforce correct column order
                 foreach (DataGridViewColumn col in this.dataGrid.Columns)
                     col.DisplayIndex = col.Index;
+
+                SendMessage(this.dataGrid.Handle, WM_SETREDRAW, true, 0);
             });
             watch.Checkpoint("Display");
 

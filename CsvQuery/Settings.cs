@@ -42,6 +42,9 @@
         [Description("Maximum length of a numeric string before it's considered a string instead"), Category("General"), DefaultValue(10)]
         public int MaxIntegerStringLength { get; set; }
 
+        [Description("Datagrid cell font size"), Category("General"), DefaultValue(9)]
+        public int DatagridCellFontSize { get; set; }
+
         [Description("Use colors from Notepad++ theme"), Category("General"), DefaultValue(false)]
         public bool UseNppStyling { get; set; }
 

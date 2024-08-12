@@ -17,7 +17,7 @@
                 var newValue = propertyInfo.GetValue(newSettings, null);
                 if (!oldValue.Equals(newValue))
                 {
-                    Trace.TraceInformation($"Setting {propertyInfo.Name} has changed");
+                    Trace.TraceInformation($"Setting {propertyInfo.Name}:{oldValue},{newValue} has changed");
                     Changed.Add(propertyInfo.Name);
                 }
             }
