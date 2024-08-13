@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Data;
+using System.Diagnostics;
 
 namespace Community.CsharpSqlite
 {
@@ -21,6 +22,7 @@ namespace Community.CsharpSqlite
         /// </summary>
         public SQLiteDatabase()
         {
+            Trace.TraceInformation($"SQLite SQLiteDatabase NULL");
             db = null;
         }
         /// <summary>
@@ -29,6 +31,7 @@ namespace Community.CsharpSqlite
         /// <param name="DatabaseName">Name (and path) to SQLite database file</param>
         public SQLiteDatabase(String DatabaseName)
         {
+            Trace.TraceInformation($"SQLite SQLiteDatabase '{DatabaseName}'");
             OpenDatabase(DatabaseName);
         }
 
@@ -125,6 +128,7 @@ Sqlite3.sqlite3_open
         /// <returns></returns>
         public DataTable ExecuteQuery(String query)
         {
+            Trace.TraceInformation($"SQLite ExecuteQuery '{query}'");
             // compiled query
             SQLiteVdbe statement = new SQLiteVdbe(this, query);
 

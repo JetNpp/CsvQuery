@@ -59,7 +59,10 @@ namespace CsvQuery
         {
             Trace.TraceInformation("Main.OnValidateChanges fired");
             if (!e.Changed.Contains(nameof(Settings.StorageProvider)) && !e.Changed.Contains(nameof(Settings.Database)))
+            {
                 return;
+            }
+
             Trace.TraceInformation($"Main.OnValidateChanges relevant! type={e.NewSettings.StorageProvider}, db={e.NewSettings.Database}");
             try
             {

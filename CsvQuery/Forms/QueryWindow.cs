@@ -74,7 +74,20 @@
                     System.Drawing.Font oldFont = this.dataGrid.DefaultCellStyle.Font;
                     Main.Settings.DatagridCellFontSize = e.NewSettings.DatagridCellFontSize;
                     this.dataGrid.DefaultCellStyle.Font = new System.Drawing.Font(oldFont.Name, Main.Settings.DatagridCellFontSize);
+
+                    var oldSource = this.dataGrid.DataSource;
+                    this.dataGrid.DataSource = null;
+
+                    using (var gfx = this.dataGrid.CreateGraphics())
+                    {
+                        var points = this.dataGrid.DefaultCellStyle.Font.SizeInPoints;
+                        this.dataGrid.RowTemplate.Height = (int)(points * gfx.DpiX / 72 + 6);
+                    }
+                    this.dataGrid.DataSource = oldSource;
                     SendMessage(this.dataGrid.Handle, WM_SETREDRAW, true, 0);
+
+                    // FormatDataGrid();
+                    this.dataGrid.Update();
                     this.dataGrid.Refresh();
                 }
             }
@@ -322,73 +335,6 @@
             }
 
             return maxItem;
-        }
-
-        /// <summary>
-        /// Provides very fast and basic column sizing for large data sets.
-        /// </summary>
-        private void FastAutoSizeColumns(DataGridView targetGrid,bool fontChanged)
-        {
-            // Cast out a DataTable from the target grid datasource.
-            // We need to iterate through all the data in the grid and a DataTable supports enumeration.
-            var gridTable = (DataTable)targetGrid.DataSource;
-            System.Drawing.Font font = this.dataGrid.DefaultCellStyle.Font;
-
-            /*
-            if (fontChanged)
-            {
-                    using (var gfx = this.dataGrid.CreateGraphics())
-                    {
-                        this.dataGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
-
-                        var points = font.SizeInPoints;
-                        int pixels = (int)(points * gfx.DpiX / 72 + 6);
-                        for (int i = 0; i < dataGrid.Rows.Count; ++i)
-                        {
-                            if (dataGrid.Rows[i].Height == pixels)
-                            {
-                                break;
-                            }
-
-                            dataGrid.Rows[i].Height = pixels;
-                        }
-
-                        this.dataGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCellsExceptHeaders;
-                    }
-            }
-            */
-                       
-            // Create a graphics object from the target grid. Used for measuring text size.
-            using (var gfx = targetGrid.CreateGraphics())
-            {
-                // Iterate through the columns.
-                for (int i = 0; i < gridTable.Columns.Count; i++)
-                {
-                    // Leverage Linq enumerator to rapidly collect all the rows into a string array, making sure to exclude null values.
-                    string[] colStringCollection = gridTable.AsEnumerable().Where(r => r.Field<object>(i) != null).Select(r => r.Field<object>(i).ToString()).ToArray();
-                    // var longestColString = colStringCollection.OrderByDescending(n => n.Length).FirstOrDefault();
-                    var longestColString = Longest(colStringCollection, s => s.Length);
-
-                    if (longestColString.Length < targetGrid.Columns[i].HeaderText.Length)
-                    {
-                        longestColString = targetGrid.Columns[i].HeaderText;
-                    }
-                    
-                    // Use the graphics object to measure the string size.
-                    var colWidth = gfx.MeasureString(longestColString, font);
-                    colWidth.Width += 6.0f;
-
-                    // If the calculated width is larger than the column header width, set the new column width.
-                    if (colWidth.Width > targetGrid.Columns[i].HeaderCell.Size.Width)
-                    {
-                        targetGrid.Columns[i].Width = (int)colWidth.Width;
-                    }
-                    else // Otherwise, set the column width to the header width.
-                    {
-                        targetGrid.Columns[i].Width = Math.Min(targetGrid.Columns[i].HeaderCell.Size.Width, (int)colWidth.Width);
-                    }
-                }
-            }
         }
 
         private void Execute(IntPtr bufferId, DiagnosticTimer watch)
