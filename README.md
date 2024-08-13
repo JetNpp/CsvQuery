@@ -44,6 +44,11 @@ Planned features
 * Support for more types of CSV files (more test cases, basically)
 * Optimizations
 
+Some Mods by JetNpp
+----------------
+
+* settings:show row number
+* settings:set font size.
 
 Auto-detection
 --------------
