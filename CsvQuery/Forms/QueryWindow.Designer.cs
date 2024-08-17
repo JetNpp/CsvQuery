@@ -67,6 +67,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             this.dataGrid.ContextMenuStrip = this.contextMenuStrip;
             this.dataGrid.Location = new System.Drawing.Point(13, 27);
             this.dataGrid.Name = "dataGrid";
